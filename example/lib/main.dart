@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_easy_amap/flutter_easy_amap.dart';
+import 'package:simple_permissions/simple_permissions.dart';
+import 'util.dart';
 
 void main() => runApp(MyApp());
 
@@ -26,7 +28,6 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-
   AmapLocation _amapLocation;
 
   @override
@@ -49,9 +50,16 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   _initPage() async {
-    AmapLocation amapLocation = await FlutterEasyAmap.getLocation();
-    setState(() {
-      _amapLocation = amapLocation;
+    Util.requestPermission(Permission.AccessFineLocation)
+        .then((isAllowed) async {
+      if (isAllowed) {
+        AmapLocation amapLocation = await FlutterEasyAmap.getLocation();
+        setState(() {
+          _amapLocation = amapLocation;
+        });
+      } else {
+        Util.showPermissionDialog(context, '我们需要定位权限取得定位信息');
+      }
     });
   }
 }
